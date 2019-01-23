@@ -1,5 +1,3 @@
-
-require('./js/keypressHandler').initialize();
 const handler = require('./js/httpHandler');
 
 const http = require('http');

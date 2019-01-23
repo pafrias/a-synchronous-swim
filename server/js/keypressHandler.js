@@ -1,5 +1,7 @@
 const _ = require('underscore');
 const keypress = require('keypress');
+const Messages = require('./messageQueue');
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Utility Function ///////////////////////////////////////////////////////////
@@ -14,7 +16,7 @@ const isValidMessage = (message) => {
 const logKeypress = (key) => {
   // in raw-mode it's handy to see what's been typed
   // when not in raw mode, the terminal will do this for us
-  if (process.stdin.isRaw) {
+  if (process.stdin.isRaw) { 
     process.stdout.write(key);
   }
 };
@@ -28,16 +30,18 @@ var message = ''; // a buffer to collect key presses
 module.exports.initialize = () => {
 
   // setup an event handler on standard input
-  process.stdin.on('keypress', (chunk, key) => {
+  process.stdin.on('keypress', (chunk, key) => { 
     // ctrl+c should quit the program
     if (key && key.ctrl && key.name === 'c') {
       process.exit();
     }
 
+    if (key && key.ctrl && isValidMessage(key.name)) {
+      Messages.enqueue(key.name);
+    } 
     // check to see if the keypress itself is a valid message
-    if (isValidMessage(key.name)) {
-      console.log(`Message received: ${key.name}`);
-      return; // don't do any more processing on this key
+    if (isValidMessage(key.name)) { // don't do any more processing on this key
+      Messages.enqueue(key.name); //changed
     }
     
     // otherwise build up a message from individual characters
@@ -45,7 +49,7 @@ module.exports.initialize = () => {
       // on enter, process the message
       logKeypress('\n');
       if (isValidMessage(message)) {
-        console.log(`Message received: ${message}`);
+        Messages.enqueue(message); //changed
       }
       // clear the buffer where we are collecting keystrokes
       message = '';
@@ -54,9 +58,12 @@ module.exports.initialize = () => {
       message += key.name;
       logKeypress(key.name);
     }
-
   });
 };
+
+module.exports.get = () => {
+  return Messages.dequeue();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration -- do not modify /////////////////////////////////////////////
