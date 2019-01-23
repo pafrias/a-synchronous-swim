@@ -6,7 +6,7 @@
   $.get(serverUrl, (data) => {
     SwimTeam.move(data.toLowerCase())
   });
-  setTimeout(doTheThings, 100);
+  setTimeout(doTheThings, 40);
   };
 
   doTheThings();

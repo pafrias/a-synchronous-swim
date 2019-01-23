@@ -2,27 +2,11 @@ const SwimTeam = {
 
   // direction, start and range all need to match the CSS
   angle: 0, // rotation from pointing left, in radians
-  position: { top: 100, left: 100 },
-  range: { top: 0, left: 0, bottom: 400, right: 300 },
-
-  isInRange: () => {
-    return true;
-    var sine = Math.sin(SwimTeam.angle * Math.PI);
-    //do stuff with sine
-    // needs fix for angles
-    
-    //switch cases?
-    if (position.top > range.position.top && top < range.bottom) {
-      if (position.left > range.position.left && left < range.right) {
-        return true;
-      }
-    }
-    return false;
-  },
+  position: { top: 150, left: 150 },
+  range: { top: 0, left: 0, bottom: 400, right: 600 },
 
   move: (direction) => {
     
-    if (!direction) { return; } // in case of sabotage
     console.log(`Lets go: ${direction}`); 
     
     if (direction === 'left') {
@@ -37,33 +21,48 @@ const SwimTeam = {
   },
 
   swim: (direction) => { // expect a num
-    if (SwimTeam.isInRange()) { //helper function
+    if (SwimTeam.isInBounds(direction) && direction === 'up') { //helper function
       SwimTeam.position.top -= 10 * Math.sin(SwimTeam.angle * Math.PI);
       SwimTeam.position.left -= 10 * Math.cos(SwimTeam.angle * Math.PI);
+    } else if (SwimTeam.isInBounds(direction) && direction === 'down') {
+      SwimTeam.position.top += 10 * Math.sin(SwimTeam.angle * Math.PI);
+      SwimTeam.position.left += 10 * Math.cos(SwimTeam.angle * Math.PI);
     }
 
     $('.team')
       .css('top', `${SwimTeam.position.top}px`)
       .css('left', `${SwimTeam.position.left}px`);
 
-    /*
-      Refactor direction to represent degrees
-      if direction is 0
-      --> move only left
-      if direction is 90
-      --> move only up
-      if direction is 180
-      --> move only right
-      if direction is 270
-      --> move only down
+  },
 
-    New update Loc function
-      1) get sin of dir
-      2) get cos of dir
-      3) add
-    */
-
-    // calculate what the new position is for the swim-team is
-    // but don't let the swim-team get outside the max bounds!
+  isInBounds: (direction) => {
+    
+    // if sine is positive, swimmer is pointing up
+    var sine = Math.sin(SwimTeam.angle * Math.PI);
+    // if cosing is positive, swimmer is pointing left
+    var cosine = Math.cos(SwimTeam.angle * Math.PI);
+    
+    if (direction === 'up') {
+      if (cosine > 0 && SwimTeam.position.left < 0) { //moving forward to left
+        return false;
+      } else if (cosine < 0 && SwimTeam.position.left > 600) { //moving forward to right
+        return false;
+      } else if (sine > 0 && SwimTeam.position.top < 0) { //moving forward to top
+        return false;
+      } else if (sine < 0 && SwimTeam.position.top > 400) { //moving forward to bottom
+        return false;
+      }
+    } else if (direction === 'down') {
+      if (cosine < 0 && SwimTeam.position.left < 0) { //moving backwards to left
+        return false;
+      } else if (cosine > 0 && SwimTeam.position.left > 600) { //moving backwards to right
+        return false;
+      } else if (sine < 0 && SwimTeam.position.top < 0) { //moving backwards to top
+        return false;
+      } else if (sine > 0 && SwimTeam.position.top > 400) { //moving backwards to bottom
+        return false;
+      }
+    }
+    return true;
   }
 };

@@ -2,7 +2,6 @@
 const messages = []; // the storage unit for messages
 
 module.exports.enqueue = (message) => {
-  console.log('');
   messages.push(message);
 };
 

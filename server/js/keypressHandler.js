@@ -7,7 +7,7 @@ const Messages = require('./messageQueue');
 // Utility Function ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
 //added rotation with a & d
-const validMessages = ['left', 'right', 'up', 'down']; 
+const validMessages = ['left', 'right', 'up', 'down', 'circle', 'eight']; 
 
 const isValidMessage = (message) => {
   return _.contains(validMessages, message);
@@ -40,14 +40,22 @@ module.exports.initialize = () => {
     // check to see if the keypress itself is a valid message
     if (isValidMessage(key.name)) { 
         Messages.enqueue(key.name);
+        console.log('');
     }
 
     // otherwise build up a message from individual characters
     if (key && (key.name === 'return' || key.name === 'enter')) {
       logKeypress('\n');
       if (isValidMessage(message)) {
-        Messages.enqueue(message);
+        if (message === 'circle') {
+          circle();
+        } else if (message === 'eight') {
+          figureEight();
+        } else {
+          Messages.enqueue(message);
+        }
       }
+      console.log('');
       // clear the buffer where we are collecting keystrokes
       message = '';
     } else {
@@ -62,7 +70,30 @@ module.exports.get = () => {
   return Messages.dequeue();
 }
 
-// elaborate rotation move?
+var circle = () => {
+  for (let i = 0; i < 40; i++) {
+    Messages.enqueue('up');
+    Messages.enqueue('left');
+  }
+}
+
+var figureEight = () => {
+  Messages.enqueue('up');
+  Messages.enqueue('up');
+  for (let i = 0; i < 30; i++ ) {
+    Messages.enqueue('up');
+    Messages.enqueue('right');
+  }
+  for (let i = 0; i < 4; i++) {
+    Messages.enqueue('up');
+  }
+  for (let i = 0; i < 30; i++ ) {
+    Messages.enqueue('up');
+    Messages.enqueue('left');
+  }
+  Messages.enqueue('up');
+  Messages.enqueue('up');
+}
 
 
 
