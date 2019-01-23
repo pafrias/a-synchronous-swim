@@ -6,8 +6,8 @@ const Messages = require('./messageQueue');
 ///////////////////////////////////////////////////////////////////////////////
 // Utility Function ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
-
-const validMessages = ['left', 'right', 'up', 'down'];
+//added rotation with a & d
+const validMessages = ['left', 'right', 'up', 'down']; 
 
 const isValidMessage = (message) => {
   return _.contains(validMessages, message);
@@ -31,25 +31,22 @@ module.exports.initialize = () => {
 
   // setup an event handler on standard input
   process.stdin.on('keypress', (chunk, key) => { 
+
     // ctrl+c should quit the program
     if (key && key.ctrl && key.name === 'c') {
       process.exit();
+    } 
+
+    // check to see if the keypress itself is a valid message
+    if (isValidMessage(key.name)) { 
+        Messages.enqueue(key.name);
     }
 
-    if (key && key.ctrl && isValidMessage(key.name)) {
-      Messages.enqueue(key.name);
-    } 
-    // check to see if the keypress itself is a valid message
-    if (isValidMessage(key.name)) { // don't do any more processing on this key
-      Messages.enqueue(key.name); //changed
-    }
-    
     // otherwise build up a message from individual characters
     if (key && (key.name === 'return' || key.name === 'enter')) {
-      // on enter, process the message
       logKeypress('\n');
       if (isValidMessage(message)) {
-        Messages.enqueue(message); //changed
+        Messages.enqueue(message);
       }
       // clear the buffer where we are collecting keystrokes
       message = '';
@@ -64,6 +61,14 @@ module.exports.initialize = () => {
 module.exports.get = () => {
   return Messages.dequeue();
 }
+
+// elaborate rotation move?
+
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Configuration -- do not modify /////////////////////////////////////////////
